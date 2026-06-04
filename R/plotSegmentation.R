@@ -283,9 +283,9 @@ plotCNclonal <- function(sample, ClonalCN, organism = "human", output_dir = "./o
     }
     
     if(file == "_coarse-grained"){
-      segm <- getScevanCNVfinal(sample)
+      segm <- getScevanCNVfinal(sample, path = output_dir)
     }else{
-      segm <- getScevanCNV(paste0(sample,name))
+      segm <- getScevanCNV(paste0(sample,name), path = output_dir)
     }
     
     

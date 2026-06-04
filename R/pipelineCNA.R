@@ -112,7 +112,6 @@ getClonalCNProfile <- function(res_class, res_proc, sample, par_cores, beta_vega
   # File does get written - need to fix the path in the sub function
   segm.mean <- getScevanCNV(sample, beta = "ClonalCNProfile", path = output_dir)$Mean
   CNV <- cbind(CNV,segm.mean)
-  
   write.table(CNV, file = file.path(output_dir, paste0(sample, "_Clonal_CN.seg")) , sep = "\t", quote = FALSE)
   
   #TODO I need to trace back where this file is created before this is changed,

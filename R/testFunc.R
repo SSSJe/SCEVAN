@@ -242,13 +242,13 @@ analyzeSegm <- function(samp, nSub = 1, output_dir = "./output"){
 
 # This whole function is never called anywhere - can be depreciated. 
 # Outside the scope of my PR (Alex van Kaam, 07-03-2025)
-analyzeSegm2 <- function(samp, nSub = 1){
+analyzeSegm2 <- function(samp, nSub = 1, output_dir = "/output/"){
 
   all_segm <- list()
 
   for (i in 1:nSub){
 
-    segm <- read.csv(paste0("./output/ ",samp,"_subclone",i," vega_output"), sep = "\t")
+    segm <- read.csv(file.path(output_dir, paste0(,samp,"_subclone",i," vega_output")), sep = "\t")
     all_segm[[paste0(samp,"_subclone", i)]] <- getPossibleSpecAltFromSeg(segm)
 
   }

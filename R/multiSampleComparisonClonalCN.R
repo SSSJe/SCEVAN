@@ -13,9 +13,9 @@ plotAllSubclonalCN <- function(sample, pathOutput = "./output/"){
   
   allFile <- list.files(pathOutput, pattern = paste0(sample,"_subclone[1-9]_CN.seg") )
 
-  CNVtot <- lapply(allFile, function(i) read.table(paste0(pathOutput,i), sep="\t", header=TRUE, as.is=TRUE))
+  CNVtot <- lapply(allFile, function(i) read.table(file.path(pathOutput,i), sep="\t", header=TRUE, as.is=TRUE))
   
-  png(paste0(pathOutput,sample,"_compareSubclonalCN.png",sep=""), height=2250, width=1350, res=100)
+  png(file.path(pathOutput,paste0(sample,"_compareSubclonalCN.png",sep="")), height=2250, width=1350, res=100)
   
   par(mfrow=c(length(allFile),1),cex=1, cex.main = 1.5, cex.lab = 1.5,xaxs="i")
   
@@ -35,17 +35,16 @@ plotAllSubclonalCN <- function(sample, pathOutput = "./output/"){
 #'
 #' @param samples Vector with sample names to be plotted
 #' @param name Analysis name
+#' @param pathOutput Path to the output folder containing the output of pipelineCNA.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-plotAllClonalCN <- function(samples, name){
-  
-  #CNVtot <- lapply(samples, function(i) read.table(paste0("./output/"," ",i," _  _CN.seg"), sep="\t", header=TRUE, as.is=TRUE))
-  CNVtot <- lapply(samples, function(i) read.table(paste0("./output/",i,"_Clonal_CN.seg"), sep="\t", header=TRUE, as.is=TRUE))
-  
-  png(paste0("./output/",name,"_compareClonalCN.png",sep=""), height=1550, width=2350, res=100)
+plotAllClonalCN <- function(samples, name, pathOutput = "./output/"){
+ 
+  CNVtot <- lapply(samples, function(i) read.table(file.path(pathOutput, paste0(i,"_Clonal_CN.seg")), sep="\t", header=TRUE, as.is=TRUE))
+  png(file.path(pathOutput,paste0(name,"_compareClonalCN.png",sep="")), height=1550, width=2350, res=100)
   
   if(length(samples)>3){
     par(mfrow=c(3,ceiling(length(samples)/3)), cex=1, cex.main = 1.5, cex.lab = 1.5,xaxs="i")
@@ -85,7 +84,7 @@ multiSampleComparisonClonalCN <- function(listCountMtx, listNormCells = NULL, an
   names(resList) <- names(listCountMtx)
   
   sampleAlterList <- lapply(names(listCountMtx), function(x) {
-    analyzeSegm(x, nSub = 0)
+    analyzeSegm(x, nSub = 0, output_dir = output_dir)
   })
   names(sampleAlterList) <- paste0(names(listCountMtx),"_subclone", 1:length(names(listCountMtx)))
   
@@ -107,9 +106,9 @@ multiSampleComparisonClonalCN <- function(listCountMtx, listNormCells = NULL, an
   
   rownames(oncoHeat) <- names(listCountMtx)
   
-  plotOncoHeatSubclones(oncoHeat, length(names(listCountMtx)), analysisName, NULL, organism)
+  plotOncoHeatSubclones(oncoHeat, length(names(listCountMtx)), analysisName, NULL, organism, output_dir = output_dir)
   
-  plotAllClonalCN(names(listCountMtx), name = analysisName)
+  plotAllClonalCN(names(listCountMtx), name = analysisName, pathOutput = output_dir)
   
   if(length(names(listCountMtx))>2 & plotTree) plotCloneTreeNew(names(listCountMtx), CLONAL_MULTI = TRUE, analysisName = analysisName, output_dir = output_dir)
   
