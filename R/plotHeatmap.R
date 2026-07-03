@@ -595,9 +595,8 @@ plotTSNE <- function(raw_count_mtx, CNAmat , filt_genes, tum_cells, clustersSub,
       error = function(e){ 
         #Rtsne(t(as.matrix(CNAmat[,tum_cells])), perplexity = 15)
         mtxplot <- t(as.matrix(CNAmat[,names(clustersSub)]))
-        res <- Rtsne(mtxplot, perplexity = floor((nrow(mtxplot) - 1) / 3))
+        Rtsne(mtxplot, perplexity = floor((nrow(mtxplot) - 1) / 3))
         rm(mtxplot)
-        return(res)
       }
     )
     
@@ -1008,7 +1007,7 @@ plotConsensusCNA <- function(samp, nSub, organism = "human", pathOutput = "./out
   # segm2_pos <- segmList[[grep("subclone1",names(dfL))]]
   segm2_pos <- segmList[[grep("^subclone1$", names(dfL))]]
   df <- lapply(1:nSub, function(x) {
-    subb <- paste0("subclone",x)
+    subb <- paste0("^subclone", x, "$") 
     dfL[[grep(subb,names(dfL))]]
   })
   
@@ -1071,15 +1070,15 @@ plotOncoHeat <- function(oncoHeat, nSub, samp, annotdf, mycolors, organism = "hu
   }
   
   #TODO
-  
-  png(file.path(output_dir, paste0(samp, "OncoHeat2.png")), height=2350, width=1050, res=150)
-  plotHeatmapOncoHeat <- pheatmap::pheatmap(t(oncoHeat), color = legendColors, cluster_rows = FALSE, cluster_cols = FALSE, annotation_col = annotdf, annotation_colors = mycolors, legend_breaks = legendBreaks, legend_labels = legendLabels,cellwidth = 30, annotation_legend = TRUE, fontsize = 14, labels_col = rep("",nrow(oncoHeat)))  
-  h = grid::convertHeight(sum(plotHeatmapOncoHeat$gtable$heights), "in", TRUE)
-  w = grid::convertWidth(sum(plotHeatmapOncoHeat$gtable$widths), "in", TRUE)
-  
-  ggplot2::ggsave(file.path(output_dir, paste0(samp, "OncoHeat.png")), device = "png", plotHeatmapOncoHeat$gtable, width=w, height=h, dpi=300)
+  width_sig <- ifelse(nrow(oncoHeat) < 6, 7, 7 + nrow(oncoHeat) * 0.5)
+  height_sig <- ifelse(ncol(oncoHeat) < 20, 5, min(5 + ncol(oncoHeat) * 0.2, 40))
+  png(file.path(output_dir, paste0(samp, "OncoHeat2.png")), height = height_sig, width = width_sig, res = 300, units = "in")
+  plotHeatmapOncoHeat <- pheatmap::pheatmap(t(oncoHeat), color = legendColors, cluster_rows = FALSE, cluster_cols = FALSE, annotation_col = annotdf, annotation_colors = mycolors, legend_breaks = legendBreaks, legend_labels = legendLabels,cellwidth = 30, annotation_legend = TRUE, fontsize = 14, labels_col = rep("",nrow(oncoHeat)))
   dev.off()
-  
+  h = ifelse(ncol(oncoHeat) < 20, grid::convertHeight(sum(plotHeatmapOncoHeat$gtable$heights), "in", TRUE), min(5 + ncol(oncoHeat) * 0.2, 40))
+  w = grid::convertWidth(sum(plotHeatmapOncoHeat$gtable$widths), "in", TRUE)
+  ggplot2::ggsave(file.path(output_dir, paste0(samp, "OncoHeat.png")), device = "png", plotHeatmapOncoHeat$gtable, 
+                  bg= 'white', width=w + 1, height = h, dpi = 300)
   #TODO
   
   save(oncoHeat, plotHeatmapOncoHeat, file = file.path(output_dir, paste0(samp, "PlotOncoHeat.RData")))
@@ -1367,7 +1366,7 @@ plotCloneTreeNew <- function(sample, res_subclones = 0, CLONAL_MULTI = FALSE, an
       if(CLONAL_MULTI){
         samples <- sample
         
-        segmList <- lapply(samples, function(sample) read.table(file.path(output_dir, paste0(sample, "_Clonal_Cn.seg")), sep="\t", header=TRUE, as.is=TRUE))
+        segmList <- lapply(samples, function(sample) read.table(file.path(output_dir, paste0(sample, "_Clonal_CN.seg")), sep="\t", header=TRUE, as.is=TRUE))
         names(segmList) <- samples
         res_subclones <- c()
         res_subclones$n_subclones <- length(samples)
